@@ -1,0 +1,41 @@
+FROM ubuntu:22.04
+
+ENV PYTHON_VERSION 3.9.0
+
+#Set of all dependencies needed for pyenv to work on Ubuntu
+RUN apt install -y ubuntu-keyring
+RUN apt-get update
+RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget ca-certificates curl llvm git screen nano
+
+# Set-up necessary Env vars for PyEnv
+ENV PYENV_ROOT /root/.pyenv
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+
+# Install pyenv
+RUN set -ex \
+    && curl https://pyenv.run | bash \
+    && pyenv update
+
+
+# install python versions
+RUN pyenv install 3.6.8
+RUN pyenv install 3.7.3
+RUN pyenv install 3.8.0
+RUN pyenv install 3.9.0
+RUN pyenv install 3.10.0
+RUN pyenv install 3.11.0
+RUN pyenv install 3.12.0
+
+RUN pyenv global $PYTHON_VERSION \
+    && pyenv rehash
+
+# install pip
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python get-pip.py
+
+COPY ./robo-pier-lib/ /opt/
+
+RUN pip install -r /opt/requirements.txt
+
+# start the python shell
+ENTRYPOINT ["python", "-i", "-q", "/opt/run.py"]
