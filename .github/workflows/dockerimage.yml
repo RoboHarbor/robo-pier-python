@@ -1,11 +1,9 @@
 name: Create ccxt-market-ticker docker container
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - develop
-      - master
+    push:
+        branches:
+        - main
 
 jobs:
   build-docker:
