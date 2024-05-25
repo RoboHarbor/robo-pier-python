@@ -18,7 +18,6 @@ RUN set -ex \
 
 
 # install python versions
-RUN pyenv install 3.6.8
 RUN pyenv install 3.7.3
 RUN pyenv install 3.8.0
 RUN pyenv install 3.9.0
