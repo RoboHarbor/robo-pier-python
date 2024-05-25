@@ -1,4 +1,4 @@
-name: Create ccxt-market-ticker docker container
+name: Create docker container
 
 on:
     push:

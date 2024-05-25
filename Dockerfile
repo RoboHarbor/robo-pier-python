@@ -5,7 +5,7 @@ ENV PYTHON_VERSION 3.9.0
 #Set of all dependencies needed for pyenv to work on Ubuntu
 RUN apt install -y ubuntu-keyring
 RUN apt-get update
-RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget ca-certificates curl llvm git screen nano
+RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget ca-certificates curl llvm git screen nano liblzma-dev libffi-dev lzma
 
 # Set-up necessary Env vars for PyEnv
 ENV PYENV_ROOT /root/.pyenv
