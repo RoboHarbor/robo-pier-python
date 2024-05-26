@@ -32,9 +32,10 @@ RUN pyenv global $PYTHON_VERSION \
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python get-pip.py
 
-COPY ./robo-pier-lib/ /opt/
+COPY ./robo_pier_lib/ /opt/robo_pier_lib/
+COPY entry_point.py /opt/entry_point.py
 
 RUN pip install -r /opt/requirements.txt
 
 # start the python shell
-ENTRYPOINT ["python", "-i", "-q", "/opt/run.py"]
+ENTRYPOINT ["python", "-i", "-q", "/opt/entry_point.py"]
