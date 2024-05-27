@@ -3,6 +3,9 @@ import sys
 
 from robo_pier_lib.ProcessCallback import ProcessCallback
 from robo_pier_lib.run import startRobot
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 class PythonRobot(ProcessCallback):
 
