@@ -29,3 +29,8 @@ docker run -e ROBO_HARBOR=http://roboharbor:5000 -e ROBO_ID=my-robot -e ROBO_SEC
 | ONLY_TEST_CHECKOUT |         false          | This parameter is used only to test if the checkout works. After checkout the pod is deleted. |
 
 
+## Update
+
+- 2024-05-28 - Credentials added to checkout
+- 
+
