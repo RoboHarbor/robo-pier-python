@@ -13,10 +13,13 @@ class PythonRobot(ProcessCallback):
         print("Setting python version to " + version)
         subprocess.run("pyenv global " + version, shell=True, check=True)
 
-    def run(self):
-        if self.get_config_value('python_version') is not None:
-            self.set_python_version(self.get_config_value('python_version'))
-        process = subprocess.Popen("python test.py ", shell=True, stdout=subprocess.PIPE,
+    async def run(self):
+        if self.get_config_value('pythonVersion') is not None:
+            self.set_python_version(self.get_config_value('pythonVersion'))
+
+        script = self.get_config_value('script')
+        process = subprocess.Popen("python  "+script, cwd=self.get_app_dir(),
+                                   shell=True, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT, bufsize=0, text=True)
 
         while True:
