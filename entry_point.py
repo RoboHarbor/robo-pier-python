@@ -20,9 +20,9 @@ class PythonRobot(ProcessCallback):
 
 
         try:
-            process = subprocess.Popen("pip"+python_version+" install -r requirements.txt ", cwd=self.get_app_dir(),
-                                       shell=True, stdout=subprocess.PIPE,
-                                       stderr=subprocess.STDOUT, bufsize=0, text=True)
+            print("Installing requirements")
+            subprocess.run("pip"+python_version+" install -r requirements.txt ", cwd=self.get_app_dir(),
+                                       shell=True, check=True)
 
         except Exception as e:
             print("Error: ", str(e))
