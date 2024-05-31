@@ -38,4 +38,4 @@ COPY entry_point.py /opt/entry_point.py
 RUN pip install -r /opt/robo_pier_lib/requirements.txt
 
 # start the python shell
-ENTRYPOINT ["python", "-i", "-q", "/opt/entry_point.py"]
+CMD ["python", "-i", "-q", "-u", "/opt/entry_point.py"]

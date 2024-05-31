@@ -14,11 +14,21 @@ class PythonRobot(ProcessCallback):
         subprocess.run("pyenv global " + version, shell=True, check=True)
 
     async def run(self):
+        python_version = "3.9"
         if self.get_config_value('pythonVersion') is not None:
-            self.set_python_version(self.get_config_value('pythonVersion'))
+            python_version = self.get_config_value('pythonVersion')
+
+
+        try:
+            process = subprocess.Popen("pip"+python_version+" install -r requirements.txt ", cwd=self.get_app_dir(),
+                                       shell=True, stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT, bufsize=0, text=True)
+
+        except Exception as e:
+            print("Error: ", str(e))
 
         script = self.get_config_value('script')
-        process = subprocess.Popen("python  "+script, cwd=self.get_app_dir(),
+        process = subprocess.Popen("python"+python_version+"  "+script, cwd=self.get_app_dir(),
                                    shell=True, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT, bufsize=0, text=True)
 
