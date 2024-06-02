@@ -9,10 +9,6 @@ logging.basicConfig(level=logging.INFO)
 
 class PythonRobot(ProcessCallback):
 
-    def set_python_version(self, version):
-        print("Setting python version to " + version)
-        subprocess.run("pyenv global " + version, shell=True, check=True)
-
     async def run(self):
         python_version = "3.9"
         if self.get_config_value('pythonVersion') is not None:
