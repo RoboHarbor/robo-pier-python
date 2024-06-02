@@ -32,5 +32,5 @@ docker run -e ROBO_HARBOR=http://roboharbor:5000 -e ROBO_ID=my-robot -e ROBO_SEC
 ## Update
 
 - 2024-05-28 - Credentials added to checkout
-- 
+- 2024-06-03 - Added orjson
 
