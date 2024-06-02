@@ -26,17 +26,15 @@ class PythonRobot(ProcessCallback):
         script = self.get_config_value('script')
         process = subprocess.Popen("pyenv local "+python_version+" && python "+script, cwd=self.get_app_dir(),
                                    shell=True, stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT, bufsize=0, text=True)
+                                   stderr=subprocess.STDOUT, bufsize=0, text=True, close_fds=True)
 
         while True:
             line = process.stdout.readline()
             if process.poll() != None:
                 break
             if line != '':
-                sys.stdout.write(line)
-                sys.stdout.flush()
+                print(line.rstrip())
         rc = process.poll()
-        print("aaa finished with return code: " + str(rc))
-        return 0
+        return rc
 
 startRobot(PythonRobot)
