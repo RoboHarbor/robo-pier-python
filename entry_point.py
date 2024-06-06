@@ -16,9 +16,18 @@ class PythonRobot(ProcessCallback):
 
 
         try:
+            print("Installing requirements for robo_pier_lib")
+            subprocess.run("pyenv local "+python_version+" && pip install -r requirements.txt ",
+                                        cwd="/opt/robo_pier_lib",
+                                        shell=True, check=True)
+
+        except Exception as e:
+            print("Error: ", str(e))
+
+        try:
             print("Installing requirements")
             subprocess.run("pyenv local "+python_version+" && pip install -r requirements.txt ", cwd=self.get_app_dir(),
-                                       shell=True, check=True)
+                                        shell=True, check=True)
 
         except Exception as e:
             print("Error: ", str(e))
