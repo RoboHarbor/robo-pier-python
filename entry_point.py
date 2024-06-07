@@ -17,7 +17,7 @@ class PythonRobot(ProcessCallback):
 
         try:
             print("Installing requirements")
-            subprocess.run("pyenv local "+python_version+" && pip install -r requirements.txt ", cwd=self.get_app_dir(),
+            subprocess.run("pip"+python_version+" install -r requirements.txt ", cwd=self.get_app_dir(),
                                         shell=True, check=True)
 
         except Exception as e:
@@ -25,8 +25,8 @@ class PythonRobot(ProcessCallback):
 
         script = self.get_config_value('script')
         process = subprocess.Popen("pyenv local "+python_version+" && python "+script, cwd=self.get_app_dir(),
-                                   shell=True, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, bufsize=0, text=True, close_fds=True)
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
 
         while True:
             line = process.stdout.readline()
