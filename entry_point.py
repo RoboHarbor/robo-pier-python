@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 
@@ -14,17 +15,18 @@ class PythonRobot(ProcessCallback):
         if self.get_config_value('pythonVersion') is not None:
             python_version = self.get_config_value('pythonVersion')
 
+        full_app_path = os.path.abspath("./"+self.get_app_dir())
 
         try:
             print("Installing requirements")
-            subprocess.run("pip"+python_version+" install -r requirements.txt ", cwd=self.get_app_dir(),
+            subprocess.run("pyenv local "+python_version+" && python -m pip install -r requirements.txt ", cwd=full_app_path,
                                         shell=True, check=True)
 
         except Exception as e:
             print("Error: ", str(e))
 
         script = self.get_config_value('script')
-        process = subprocess.Popen("pyenv local "+python_version+" && python "+script, cwd=self.get_app_dir(),
+        process = subprocess.Popen("pyenv local "+python_version+" && python "+script, cwd=full_app_path,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
 
