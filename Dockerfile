@@ -37,5 +37,12 @@ COPY entry_point.py /opt/entry_point.py
 
 RUN pip install -r /opt/robo_pier_lib/requirements.txt
 
+RUN python3.10 get-pip.py
+RUN python3.7.3 get-pip.py
+RUN python3.8.0 get-pip.py
+RUN python3.9.0 get-pip.py
+RUN python3.11.0 get-pip.py
+RUN python3.12.0 get-pip.py
+
 # start the python shell
 CMD ["python", "-i", "-q", "-u", "/opt/entry_point.py"]

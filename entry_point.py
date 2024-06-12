@@ -17,6 +17,12 @@ logging.basicConfig(level=logging.INFO)
 
 class PythonRobot(ProcessCallback):
 
+    def _stream_thread(self, stream, handler):
+        print("stream_thread "+str(stream))
+        for line in stream:
+            handler(line.rstrip())
+        stream.close()
+
     def stream_command(
             self,
             args,
@@ -30,17 +36,28 @@ class PythonRobot(ProcessCallback):
             **kwargs,
     ):
         """Mimic subprocess.run, while processing the command output in real time."""
-        with Popen(args, text=text, stdout=stdout, stderr=stderr, cwd=cwd, **kwargs) as process:
-            print("Process started: ", process.args)
-            with ThreadPoolExecutor(2) as pool:  # two threads to handle the streams
-                print("Process started 2: ", process.args)
-                exhaust = partial(pool.submit, partial(deque, maxlen=0))
-                exhaust(stdout_handler(line[:-1]) for line in process.stdout)
-                exhaust(stderr_handler(line[:-1]) for line in process.stderr)
-        retcode = process.poll()
-        if check and retcode:
-            raise CalledProcessError(retcode, process.args)
-        return CompletedProcess(process.args, retcode)
+        with Popen(args, text=text, stdout=stdout, stderr=stderr, cwd=cwd,  **kwargs) as process:
+            if stdout_handler:
+                print("stdout_handler")
+                stdout_thread = threading.Thread(
+                    target=partial(self._stream_thread, process.stdout, stdout_handler)
+                )
+                stdout_thread.start()
+            if stderr_handler:
+                print("stderr_handler")
+                stderr_thread = threading.Thread(
+                    target=partial(self._stream_thread, process.stderr, stderr_handler)
+                )
+                stderr_thread.start()
+            process.wait()
+            print("process.wait()")
+            if stdout_handler:
+                stdout_thread.start()
+            if stderr_handler:
+                stderr_thread.start()
+            if check and process.returncode != 0:
+                raise CalledProcessError(process.returncode, process.args)
+            return CompletedProcess(process.args, process.returncode, None, None)
 
     async def run(self):
         python_version = "3.9"
@@ -52,7 +69,7 @@ class PythonRobot(ProcessCallback):
 
         try:
             print("Installing requirements")
-            subprocess.run("pyenv local "+python_version+" && pip install -r requirements.txt ",
+            subprocess.run("python"+python_version+" -m pip install -r requirements.txt ",
                                         cwd=full_app_path,
                                         shell=True)
 
