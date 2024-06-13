@@ -69,7 +69,7 @@ class PythonRobot(ProcessCallback):
 
         try:
             print("Installing requirements")
-            subprocess.run("pyenv local "+python_version+" && pyenv exec -m pip install -r requirements.txt ",
+            subprocess.run("pyenv local "+python_version+" && python -m pip install -r requirements.txt ",
                                         cwd=full_app_path,
                                         shell=True)
 
@@ -79,7 +79,7 @@ class PythonRobot(ProcessCallback):
         script = self.get_config_value('script')
         print("Running script: ", script)
         rc = self.stream_command(
-            ["pyenv", "local", python_version, " && ", "pyenv", "exec", script],
+            ["pyenv", "local", python_version, " && ", "python", script],
             cwd=full_app_path,
             stdout_handler = print,
             stderr_handler = print
