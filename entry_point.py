@@ -54,6 +54,8 @@ class PythonRobot(ProcessCallback):
                 if stdout:
                     S = "\n".join(stdout.split('\n')[:-1])
                     print(f'{S}', file=out)
+                    #flush the output
+                    out.flush()
 
         task = asyncio.create_task(reader(p1.stdout, sys.stdout))
         task2 = asyncio.create_task(reader(p1.stderr, sys.stderr))
