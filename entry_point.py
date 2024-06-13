@@ -36,7 +36,7 @@ class PythonRobot(ProcessCallback):
             **kwargs,
     ):
         """Mimic subprocess.run, while processing the command output in real time."""
-        with Popen(args, text=text, stdout=stdout, stderr=stderr, cwd=cwd,  **kwargs) as process:
+        with Popen(" ".join(args), text=text, stdout=stdout, stderr=stderr, cwd=cwd, shell=True, **kwargs) as process:
             if stdout_handler:
                 print("stdout_handler")
                 stdout_thread = threading.Thread(
@@ -69,7 +69,7 @@ class PythonRobot(ProcessCallback):
 
         try:
             print("Installing requirements")
-            subprocess.run("python"+python_version+" -m pip install -r requirements.txt ",
+            subprocess.run("pyenv local "+python_version+" && python -m pip install -r requirements.txt ",
                                         cwd=full_app_path,
                                         shell=True)
 
@@ -79,7 +79,7 @@ class PythonRobot(ProcessCallback):
         script = self.get_config_value('script')
         print("Running script: ", script)
         rc = self.stream_command(
-            ["python"+python_version, script],
+            ["pyenv", "local", python_version, " && ", "python", script],
             cwd=full_app_path,
             stdout_handler = print,
             stderr_handler = print
