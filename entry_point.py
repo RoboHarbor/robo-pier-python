@@ -3,61 +3,25 @@ import os
 import subprocess
 import sys
 import threading
-
+from queue import Queue
+from subprocess import Popen, PIPE
+from threading import Thread
 from robo_pier_lib.ProcessCallback import ProcessCallback
 from robo_pier_lib.run import startRobot
 import logging
+import select
+import subprocess as sp
+from asyncio import create_subprocess_shell
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from subprocess import PIPE, CalledProcessError, CompletedProcess, Popen
+import pty
 
 
 logging.basicConfig(level=logging.INFO)
 
 class PythonRobot(ProcessCallback):
-
-    def _stream_thread(self, stream, handler):
-        print("stream_thread "+str(stream))
-        for line in stream:
-            handler(line.rstrip())
-        stream.close()
-
-    def stream_command(
-            self,
-            args,
-            stdout_handler=logging.info,
-            stderr_handler=logging.error,
-            check=True,
-            text=True,
-            stdout=PIPE,
-            stderr=PIPE,
-            cwd=None,
-            **kwargs,
-    ):
-        """Mimic subprocess.run, while processing the command output in real time."""
-        with Popen(" ".join(args), text=text, stdout=stdout, stderr=stderr, cwd=cwd, shell=True, **kwargs) as process:
-            if stdout_handler:
-                print("stdout_handler")
-                stdout_thread = threading.Thread(
-                    target=partial(self._stream_thread, process.stdout, stdout_handler)
-                )
-                stdout_thread.start()
-            if stderr_handler:
-                print("stderr_handler")
-                stderr_thread = threading.Thread(
-                    target=partial(self._stream_thread, process.stderr, stderr_handler)
-                )
-                stderr_thread.start()
-            process.wait()
-            print("process.wait()")
-            if stdout_handler:
-                stdout_thread.start()
-            if stderr_handler:
-                stderr_thread.start()
-            if check and process.returncode != 0:
-                raise CalledProcessError(process.returncode, process.args)
-            return CompletedProcess(process.args, process.returncode, None, None)
 
     async def run(self):
         python_version = "3.9"
@@ -69,7 +33,7 @@ class PythonRobot(ProcessCallback):
 
         try:
             print("Installing requirements")
-            subprocess.run("pyenv local "+python_version+" && python -m pip install -r requirements.txt ",
+            subprocess.run("pyenv local "+python_version+" && pyenv exec pip install -r requirements.txt ",
                                         cwd=full_app_path,
                                         shell=True)
 
@@ -78,16 +42,25 @@ class PythonRobot(ProcessCallback):
 
         script = self.get_config_value('script')
         print("Running script: ", script)
-        rc = self.stream_command(
-            ["pyenv", "local", python_version, " && ", "python", script],
-            cwd=full_app_path,
-            stdout_handler = print,
-            stderr_handler = print
-        )
 
-        if rc.returncode != 0:
-            print("Error: ", rc)
+        p1 = await create_subprocess_shell("pyenv local "+python_version+" && pyenv exec python "+script,
+                                           cwd=full_app_path,
+                                           stdout=PIPE, stderr=PIPE)
+        async def reader(s, out):
+            while True:
+                if s.at_eof():
+                    break
+                stdout = (await s.readline()).decode()
+                if stdout:
+                    S = "\n".join(stdout.split('\n')[:-1])
+                    print(f'{S}', file=out)
 
-        return rc
+        task = asyncio.create_task(reader(p1.stdout, sys.stdout))
+        task2 = asyncio.create_task(reader(p1.stderr, sys.stderr))
+        asyncio.gather(task, task2)
+
+        await p1.wait()
+
+        return p1.returncode
 
 startRobot(PythonRobot)
