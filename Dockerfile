@@ -49,5 +49,10 @@ RUN pyenv global $PYTHON_VERSION \
 
 RUN pip install -r /opt/robo_pier_lib/requirements.txt
 
+COPY change_vpn.sh /opt/change_vpn.sh
+RUN chmod +x /opt/change_vpn.sh
+COPY proton_vpn /opt/proton_vpn
+COPY torrc /opt/torrc
+
 # start the python shell
 CMD ["python", "-i", "-q", "-u", "/opt/entry_point.py"]
